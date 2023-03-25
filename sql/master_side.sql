@@ -9,28 +9,29 @@ IF EXISTS ( SELECT * FROM SYS.OBJECTS WHERE
 DROP PROCEDURE  [DBO].[SP_DANGNHAP]
 GO
     CREATE PROC [DBO].[SP_DANGNHAP]
-    @TENLOGIN NVARCHAR (50) AS
-    DECLARE @TENUSER NVARCHAR(50)
-    SELECT @TENUSER=NAME FROM SYS.SYSUSERS WHERE SID = SUSER_SID(@TENLOGIN);
-    
-    SELECT
-        USERNAME = @TENUSER,
-        HOTEN = (
-            SELECT HO + ' ' + TEN
-            FROM GIANGVIEN
-            WHERE MAGV = @TENUSER
-        ),
-        ROLENAME=NAME
-    FROM SYS.SYSUSERS
-    WHERE UID = (
-        SELECT GROUPUID
-        FROM SYS.SYSMEMBERS
-        WHERE MEMBERUID = (
-            SELECT UID
-            FROM SYS.SYSUSERS
-            WHERE NAME=@TENUSER
+        @TENLOGIN NVARCHAR (50)
+    AS
+        DECLARE @TENUSER NVARCHAR(50)
+        SELECT @TENUSER = NAME FROM SYS.SYSUSERS WHERE SID = SUSER_SID(@TENLOGIN);
+        
+        SELECT
+            USERNAME = @TENUSER,
+            HOTEN = (
+                SELECT HO + ' ' + TEN
+                FROM GIANGVIEN
+                WHERE MAGV = @TENUSER
+            ),
+            ROLENAME = NAME
+        FROM SYS.SYSUSERS
+        WHERE UID = (
+            SELECT GROUPUID
+            FROM SYS.SYSMEMBERS
+            WHERE MEMBERUID = (
+                SELECT UID
+                FROM SYS.SYSUSERS
+                WHERE NAME = @TENUSER
+            )
         )
-    )
 GO
 
 
@@ -41,29 +42,29 @@ IF EXISTS ( SELECT * FROM SYS.OBJECTS WHERE
 DROP PROCEDURE  [DBO].[SP_TAOLOGIN]
 GO
     CREATE PROC [dbo].[SP_TAOLOGIN]
-    @LGNAME VARCHAR(50),
-    @PASS VARCHAR(50),
-    @USERNAME VARCHAR(50),
-    @ROLE VARCHAR(50) AS
+        @LGNAME VARCHAR(50),
+        @PASS VARCHAR(50),
+        @USERNAME VARCHAR(50),
+        @ROLE VARCHAR(50)
+    AS
+        DECLARE @RET INT
+        EXEC @RET = SP_ADDLOGIN @LGNAME, @PASS, 'QLDSV_TC'
+        IF (@RET = 1)  -- LOGIN NAME BI TRUNG
+            RETURN 1
+    
+        EXEC @RET = SP_GRANTDBACCESS @LGNAME, @USERNAME
+        IF (@RET = 1)  -- USER  NAME BI TRUNG
+        BEGIN
+            EXEC SP_DROPLOGIN @LGNAME
+            RETURN 2
+        END
 
-    DECLARE @RET INT
-    EXEC @RET= SP_ADDLOGIN @LGNAME, @PASS, 'QLDSV_TC'
-    IF (@RET =1)  -- LOGIN NAME BI TRUNG
-        RETURN 1
- 
-    EXEC @RET= SP_GRANTDBACCESS @LGNAME, @USERNAME
-    IF (@RET =1)  -- USER  NAME BI TRUNG
-    BEGIN
-        EXEC SP_DROPLOGIN @LGNAME
-        RETURN 2
-    END
-
-    EXEC sp_addrolemember @ROLE, @USERNAME
-    IF @ROLE= 'PGV' OR @ROLE= 'KHOA'
-    BEGIN 
-        EXEC sp_addsrvrolemember @LGNAME, 'SecurityAdmin'
-    END
-    RETURN 0  -- THANH CONG
+        EXEC sp_addrolemember @ROLE, @USERNAME
+        IF @ROLE = 'PGV' OR @ROLE = 'KHOA'
+        BEGIN 
+            EXEC sp_addsrvrolemember @LGNAME, 'SecurityAdmin'
+        END
+        RETURN 0  -- THANH CONG
 GO
 
 
@@ -74,10 +75,45 @@ IF EXISTS ( SELECT * FROM SYS.OBJECTS WHERE
 DROP PROCEDURE  [DBO].[SP_XOALOGIN]
 GO
     CREATE PROC [dbo].[SP_XOALOGIN]
-    @LGNAME VARCHAR(50),
-    @USRNAME VARCHAR(50) AS
-    EXEC SP_DROPUSER @USRNAME
-    EXEC SP_DROPLOGIN @LGNAME
+        @LGNAME VARCHAR(50),
+        @USRNAME VARCHAR(50)
+    AS
+        EXEC SP_DROPUSER @USRNAME
+        EXEC SP_DROPLOGIN @LGNAME
+GO
+
+
+--- SP_UPSERT_DIEM ---
+IF EXISTS ( SELECT * FROM SYS.OBJECTS WHERE
+    OBJECT_ID(N'[DBO].[SP_UPSERT_DIEM]') = OBJECT_ID AND
+		TYPE IN (N'P', N'PC'))
+DROP PROCEDURE  [DBO].[SP_UPSERT_DIEM]
+GO
+    CREATE PROC [dbo].[SP_UPSERT_DIEM]
+        @MALTC int,
+        @MASV VARCHAR(10),
+        @DIEM_CC INT,
+        @DIEM_GK FLOAT,
+        @DIEM_CK FLOAT,
+        @HUYDANGKY BIT
+    AS
+        MERGE INTO [dbo].[DANGKY] AS T
+        USING (VALUES (@MALTC, @MASV, @DIEM_CC, @DIEM_GK, @DIEM_CK, @HUYDANGKY))
+                AS S (MALTC, MASV, DIEM_CC, DIEM_GK, DIEM_CK, HUYDANGKY)
+        ON T.MALTC = S.MALTC AND
+           T.MASV = S.MASV
+        WHEN MATCHED THEN
+            UPDATE SET
+                T.MALTC =     S.MALTC,
+                T.MASV =      S.MASV,
+                T.DIEM_CC =   S.DIEM_CC,
+                T.DIEM_GK =   S.DIEM_GK,
+                T.DIEM_CK =   S.DIEM_CK,
+                T.HUYDANGKY = S.HUYDANGKY
+
+        WHEN NOT MATCHED THEN
+            INSERT (MALTC, MASV, DIEM_CC, DIEM_GK, DIEM_CK, HUYDANGKY)
+            VALUES (S.MALTC, S.MASV, S.DIEM_CC, S.DIEM_GK, S.DIEM_CK, S.HUYDANGKY);
 GO
 
 GO

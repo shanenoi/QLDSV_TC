@@ -1,5 +1,5 @@
 # overal
-> refer repo: [here](https://github.com/PhongMax/qldsv)
+> refer repo: [here](https://github.com/PhongMax/qldsv) and [another one](https://github.com/hanamthai/CSDLPT_NGANHANG)
 - [ ] `SP_BDMH`
 - [ ] `SP_CHECKIDHOCPHIBYMASV`
 - [ ] `SP_CHECKIDHOCPHI`

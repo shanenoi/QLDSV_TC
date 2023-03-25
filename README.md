@@ -1,5 +1,5 @@
 # overal
-- [x] `SP_DANGNHAP`
+- [x] [`SP_DANGNHAP`](https://github.com/shanenoi/qldsv_tc/blob/16acb4a0284b591dc87cfe7cee6c676c10f46ea0/sql/master_side.sql#L5)
 - [ ] `SP_INSERT_DIEM`
 - [ ] `SP_REPORT_BDMH`
 - [ ] `SP_REPORT_BDTK`
@@ -7,8 +7,8 @@
 - [ ] `SP_REPORT_DSSV`
 - [ ] `SP_REPORT_DSTHM`
 - [ ] `SP_REPORT_PD`
-- [x] `SP_TAOLOGIN`
-- [x] `Xoa_Login` -> `SP_XOALOGIN`
+- [x] [`SP_TAOLOGIN`](https://github.com/shanenoi/qldsv_tc/blob/16acb4a0284b591dc87cfe7cee6c676c10f46ea0/sql/master_side.sql#L37)
+- [x] `Xoa_Login` -> [`SP_XOALOGIN`](https://github.com/shanenoi/qldsv_tc/blob/16acb4a0284b591dc87cfe7cee6c676c10f46ea0/sql/master_side.sql#L70)
 - [ ] `SP_BDMH`
 - [ ] `SP_CHECKIDHOCPHIBYMASV`
 - [ ] `SP_CHECKIDHOCPHI`

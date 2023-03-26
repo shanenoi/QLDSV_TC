@@ -6,6 +6,43 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace qldsv.Database {
+    /*
+        class Lop {
+            public string MaLop { get; set; }
+            public string TenLop { get; set; }
+            public string KhoaHoc { get; set; }
+            public string MaKhoa { get; set; }
+
+            private static Lop ScanOne(SqlDataReader reader) {
+                Lop lop = new Lop();
+                lop.MaLop = reader.GetString(reader.GetOrdinal("MALOP"));
+                lop.TenLop = reader.GetString(reader.GetOrdinal("TENLOP"));
+                lop.KhoaHoc = reader.GetString(reader.GetOrdinal("KHOAHOC"));
+                lop.MaKhoa = reader.GetString(reader.GetOrdinal("MAKHOA"));
+                return lop;
+            }
+
+            public static List<Lop> GetAll(SqlConnection connection) {
+                string query = "SELECT MALOP, TENLOP, KHOAHOC, MAKHOA FROM LOP";
+
+                SqlCommand command = new SqlCommand(query, connection);
+                SqlDataReader reader = command.ExecuteReader();
+                List<Lop> lopList = ScanAll(reader);
+                reader.Close();
+                return lopList;
+            }
+
+            private static List<Lop> ScanAll(SqlDataReader reader) {
+                List<Lop> lopList = new List<Lop>();
+                while (reader.Read()) {
+                    Lop lop = ScanOne(reader);
+                    lopList.Add(lop);
+                }
+                return lopList;
+            }
+        }
+     */
+
     class Lop {
         public string MaLop { get; set; }
         public string TenLop { get; set; }
@@ -40,6 +77,7 @@ namespace qldsv.Database {
         public int SoTienDong { get; set; }
 
         public static List<DongHocPhi> GetAll(SqlConnection connection) {
+            // MASV, NIENKHOA, HOCKY, NGAYDONG, SOTIENDONG
             string query = "SELECT * FROM CT_DONGHOCPHI";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -69,6 +107,7 @@ namespace qldsv.Database {
         public bool? HuyDangKy { get; set; }
 
         public static List<DangKy> GetAll(SqlConnection connection) {
+	        // MALTC, MASV, DIEM_CC, DIEM_GK, DIEM_CK, HUYDANGKY
             string query = "SELECT * FROM DANGKY";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -108,6 +147,7 @@ namespace qldsv.Database {
         }
 
         public static List<GiangVien> GetAll(SqlConnection connection) {
+	        // MAGV, MAKHOA, HO, TEN, HOCVI, HOCHAM, CHUYENMON
             string query = "SELECT * FROM GIANGVIEN";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -146,6 +186,7 @@ namespace qldsv.Database {
         }
 
         public static List<HocPhi> GetAll(SqlConnection connection) {
+            // MASV, NIENKHOA, HOCKY, HOCPHI
             string query = "SELECT * FROM HOCPHI";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -174,6 +215,7 @@ namespace qldsv.Database {
         }
 
         public static List<Khoa> GetAll(SqlConnection connection) {
+	        // MAKHOA, TENKHOA
             string query = "SELECT * FROM KHOA";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -207,6 +249,7 @@ namespace qldsv.Database {
         }
 
         public static List<LopTinChi> GetAll(SqlConnection connection) {
+	        // MALTC, NIENKHOA, HOCKY, MAMH, NHOM, MAGV, MAKHOA, SOSVTOITHIEU, HUYLOP
             string query = "SELECT * FROM LOPTINCHI";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -238,6 +281,7 @@ namespace qldsv.Database {
         public int SoTietTH { get; set; }
 
         public static List<MonHoc> GetAll(SqlConnection connection) {
+	        // MAMH, TENMH, SOTIET_LT, SOTIET_TH
             string query = "SELECT * FROM MONHOC";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -279,6 +323,7 @@ namespace qldsv.Database {
         }
 
         public static List<SinhVien> GetAll(SqlConnection connection) {
+	        // MASV, HO, TEN, PHAI, DIACHI, NGAYSINH, MALOP, DANGHIHOC, PASSWORD,
             string query = "SELECT * FROM SINHVIEN";
 
             SqlCommand command = new SqlCommand(query, connection);

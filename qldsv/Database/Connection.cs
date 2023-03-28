@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data.SqlClient;
 
 namespace qldsv.Database
 {
@@ -25,6 +21,13 @@ namespace qldsv.Database
         {
             return string.Format("Data Source={0};Initial Catalog={1};User Id={2};Password={3}",
                 DataSource, InitialCatalog, UserId, Password);
+        }
+
+        public SqlConnection Connect(SqlConnection Conn)
+        {
+            Conn.ConnectionString = this.ToString();
+            Conn.Open();
+            return Conn;
         }
     }
 }

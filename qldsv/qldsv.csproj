@@ -58,7 +58,6 @@
       <DependentUpon>DangNhap.cs</DependentUpon>
     </Compile>
     <Compile Include="Database\Connection.cs" />
-    <Compile Include="Database\Tables.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
     </Compile>

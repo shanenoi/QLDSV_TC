@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Data.SqlClient;
+using System.Windows.Forms;
 
 namespace qldsv
 {
     public partial class DangNhap : Form
     {
-        private SqlConnection conn_publisher = new SqlConnection();
+        private SqlConnection connPublisher = new SqlConnection();
         public DangNhap()
         {
             InitializeComponent();
@@ -24,26 +18,27 @@ namespace qldsv
             if (KetNoi_CSDLGOC() == 0) return;
             LayDSPM("select * from Get_Subscribes");
         }
-
+        
         private void LayDSPM(string query)
         {
             DataTable dt = new DataTable();
-            if (conn_publisher.State == ConnectionState.Closed) conn_publisher.Open();
-            SqlDataAdapter da = new SqlDataAdapter(query, conn_publisher);
+            if (connPublisher.State == ConnectionState.Closed) connPublisher.Open();
+            SqlDataAdapter da = new SqlDataAdapter(query, connPublisher);
             da.Fill(dt);
-            conn_publisher.Close();
-            Program.bds_dspm.DataSource = dt;
-            cmbKhoa.DataSource = Program.bds_dspm;
+            connPublisher.Close();
+            BindingSource bs = new BindingSource();
+            bs.DataSource = dt;
+            cmbKhoa.DataSource = bs;
             cmbKhoa.DisplayMember = "TENKHOA"; cmbKhoa.ValueMember = "TENSERVER";
         }
 
         private int KetNoi_CSDLGOC()
         {
-            if (conn_publisher != null && conn_publisher.State == ConnectionState.Open) conn_publisher.Close();
+            if (connPublisher != null && connPublisher.State == ConnectionState.Open) connPublisher.Close();
             try
             {
-                conn_publisher.ConnectionString = Program.connstr_publisher;
-                conn_publisher.Open();
+                connPublisher.ConnectionString = Program.ConnStrPublisher;
+                connPublisher.Open();
                 return 1;
             }
             catch (Exception e)
@@ -58,29 +53,17 @@ namespace qldsv
             if (txtTaiKhoan.Text.Trim() == "" || txtMatKhau.Text.Trim() == "")
             {
                 MessageBox.Show("Tài khoản đăng nhập không được trống", "Lỗi đăng nhập", MessageBoxButtons.OK);
-
-                // trỏ con trỏ chuột về ô user...
                 txtTaiKhoan.Focus();
                 return;
             }
 
-            Program.MLogin = txtTaiKhoan.Text;
-            Program.MPassword = txtMatKhau.Text;
-
-           
-
-            Program.MKhoa = cmbKhoa.SelectedIndex;
-
-            Program.MLoginDN = Program.MLogin;
-            Program.PasswordDN = Program.MPassword;
-            Program.ServerName = cmbKhoa.SelectedValue.ToString();
-
-            if (Program.KetNoi() == 0)
+            String ServerName = cmbKhoa.SelectedValue.ToString();
+            if (Program.EstablishDBConnection(ServerName, txtTaiKhoan.Text, txtMatKhau.Text) == 0)
             {
                 return;
             }
 
-            String strLenh = "exec SP_DANGNHAP '" + Program.MLogin + "'" ;
+            String strLenh = "exec SP_DANGNHAP '" + Program.DBUserName + "'";
             Program.MyReader = Program.ExecSqlDataReader(strLenh);
             if (Program.MyReader == null)
             {
@@ -89,8 +72,8 @@ namespace qldsv
 
             Program.MyReader.Read();
 
-            Program.UserName = Program.MyReader.GetString(0);     // Lay user name
-            if (Convert.IsDBNull(Program.UserName))
+            Program.LoginUserID = Program.MyReader.GetString(0);
+            if (Convert.IsDBNull(Program.LoginUserID))
             {
                 MessageBox.Show("Login bạn nhập không có quyền truy cập dữ liệu\nBạn xem lại username, password", "", MessageBoxButtons.OK);
                 return;
@@ -98,8 +81,8 @@ namespace qldsv
 
             try
             {
-                Program.MHoten = Program.MyReader.GetString(1);
-                Program.MGroup = Program.MyReader.GetString(2);
+                Program.LoginUserName = Program.MyReader.GetString(1);
+                Program.LoginUserGroup = Program.MyReader.GetString(2);
             }
             catch (Exception ex)
             {
@@ -112,10 +95,9 @@ namespace qldsv
             Program.Conn.Close();
 
 
-            // hiện thông tin tài khoản
-            Program.frmMain.lblMAGV.Text = "MÃ GIẢNG VIÊN : " + Program.UserName;
-            Program.frmMain.lblHOTEN.Text = "HỌ VÀ TÊN : " + Program.MHoten;
-            Program.frmMain.lblNHOM.Text = "NHÓM : " + Program.MGroup;
+            Program.frmMain.lblMAGV.Text = "MÃ GIẢNG VIÊN : " + Program.LoginUserID;
+            Program.frmMain.lblHOTEN.Text = "HỌ VÀ TÊN : " + Program.LoginUserName;
+            Program.frmMain.lblNHOM.Text = "NHÓM : " + Program.LoginUserGroup;
 
             Program.frmMain.Show();
             this.Visible = false;

@@ -58,6 +58,20 @@ namespace qldsv
             }
 
             String ServerName = cmbKhoa.SelectedValue.ToString();
+
+            /*
+             *
+             * if ui.is_login_student:
+             *   username = studentusername
+             *   password = studentpassword
+             * else
+             *   username = txtTaiKhoan.Text
+             *   password = txtMatKhau.Text
+             * end
+             * Program.EstablishDBConnection(ServerName, username, password) == 0
+             *
+             */
+
             if (Program.EstablishDBConnection(ServerName, txtTaiKhoan.Text, txtMatKhau.Text) == 0)
             {
                 return;

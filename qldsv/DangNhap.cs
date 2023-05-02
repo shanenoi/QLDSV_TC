@@ -26,10 +26,25 @@ namespace qldsv
             SqlDataAdapter da = new SqlDataAdapter(query, connPublisher);
             da.Fill(dt);
             connPublisher.Close();
-            BindingSource bs = new BindingSource();
-            bs.DataSource = dt;
-            cmbKhoa.DataSource = bs;
+            Program.bds_dspm.DataSource = dt;
+            cmbKhoa.DataSource = Program.bds_dspm;
             cmbKhoa.DisplayMember = "TENKHOA"; cmbKhoa.ValueMember = "TENSERVER";
+        }
+        private int ktttdnsv(String msv, String pass)
+        {
+            String we = "execute SP_CHECK_DN_SINHVIEN '" + msv + "', '" + pass + "'";
+            Program.Conn = connPublisher;
+
+            Program.MyReader = Program.ExecSqlDataReader(we);
+            if (Program.MyReader == null)
+            {
+                return 0;
+            }
+
+            Program.MyReader.Read();
+            int ccwer = Program.MyReader.GetInt32(3);
+            Console.WriteLine("--001", ccwer);
+            return ccwer;
         }
 
         private int KetNoi_CSDLGOC()
@@ -57,27 +72,25 @@ namespace qldsv
                 return;
             }
 
-            String ServerName = cmbKhoa.SelectedValue.ToString();
+            Program.DBUserName = txtTaiKhoan.Text.Trim(); Program.DBPassword = txtMatKhau.Text.Trim();
+            String strLenh = "exec SP_DANGNHAP '" + Program.DBUserName + "'";
 
-            /*
-             *
-             * if ui.is_login_student:
-             *   username = studentusername
-             *   password = studentpassword
-             * else
-             *   username = txtTaiKhoan.Text
-             *   password = txtMatKhau.Text
-             * end
-             * Program.EstablishDBConnection(ServerName, username, password) == 0
-             *
-             */
+            if (cbSinhVien.Checked)
+            {
+                Program.DBUserName = "loginsv";
+                Program.DBPassword = "1234";
+                strLenh = "exec SP_CHECK_DN_SINHVIEN '" + txtTaiKhoan.Text.Trim() + "', '" + txtMatKhau.Text.Trim() + "'";
+            }
 
-            if (Program.EstablishDBConnection(ServerName, txtTaiKhoan.Text, txtMatKhau.Text) == 0)
+            Program.ServerName = cmbKhoa.SelectedValue.ToString();
+            if (Program.EstablishDBConnection() == 0)
             {
                 return;
             }
 
-            String strLenh = "exec SP_DANGNHAP '" + Program.DBUserName + "'";
+            Program.OriginDBUserName = Program.DBUserName;
+            Program.OriginDBPassword = Program.DBPassword;
+
             Program.MyReader = Program.ExecSqlDataReader(strLenh);
             if (Program.MyReader == null)
             {
@@ -97,6 +110,22 @@ namespace qldsv
             {
                 Program.LoginUserName = Program.MyReader.GetString(1);
                 Program.LoginUserGroup = Program.MyReader.GetString(2);
+                if (cbSinhVien.Checked)
+                {
+                    String status = Program.MyReader.GetString(3);
+                    switch (status)
+                    {
+                        case "0":
+                            MessageBox.Show("Tài khoản đăng nhập không Tồn Tại", "Lỗi đăng nhập", MessageBoxButtons.OK);
+                            txtTaiKhoan.Focus();
+                            return;
+
+                        case "1":
+                            MessageBox.Show("Tài khoản đăng nhập không đúng mật khẩu", "Lỗi đăng nhập", MessageBoxButtons.OK);
+                            txtTaiKhoan.Focus();
+                            return;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -113,8 +142,14 @@ namespace qldsv
             Program.frmMain.lblHOTEN.Text = "HỌ VÀ TÊN : " + Program.LoginUserName;
             Program.frmMain.lblNHOM.Text = "NHÓM : " + Program.LoginUserGroup;
 
-            Program.frmMain.Show();
-            this.Visible = false;
+            if(!cbSinhVien.Checked)
+            {
+                Program.frmMain.rpgTaoLogin.Visible = true;
+            }
+
+            Program.khoaID = cmbKhoa.SelectedIndex;
+
+            this.Close();
         }
     }
 }

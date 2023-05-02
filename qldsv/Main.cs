@@ -8,6 +8,7 @@ namespace qldsv
         public Main()
         {
             InitializeComponent();
+            this.rpgTaoLogin.Visible = false;
             this.IsMdiContainer = true;
         }
 
@@ -21,6 +22,7 @@ namespace qldsv
 
         private void barButtonItem1_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
+            Console.WriteLine("trigger");
             Form frm = this.CheckExists(typeof(DangNhap));
             if (frm != null) frm.Activate();
             else
@@ -29,17 +31,59 @@ namespace qldsv
                 f.MdiParent = this;
                 f.Show();
             }
+        }
+
+        private void TaoLoginClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            Form frm = this.CheckExists(typeof(TaoLogin));
+            if (frm != null) frm.Activate();
+            else
+            {
+                TaoLogin f = new TaoLogin();
+                f.Visible = false;
+                f.MdiParent = this;
+                f.Show();
+            }
+        }
+
+        private void barBtnLop_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            Form frm = this.CheckExists(typeof(Lop));
+            if (frm != null) frm.Activate();
+            else
+            {
+                Lop f = new Lop();
+                f.Visible = false;
+                f.MdiParent = this;
+                f.Show();
+            }
 
         }
 
-        private void label1_Click(object sender, EventArgs e)
+        private void barBtnSV_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-
+            Form frm = this.CheckExists(typeof(SinhVien));
+            if (frm != null) frm.Activate();
+            else
+            {
+                SinhVien f = new SinhVien();
+                f.Visible = false;
+                f.MdiParent = this;
+                f.Show();
+            }
         }
 
-        private void label2_Click(object sender, EventArgs e)
+        private void barBtnMonHoc_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-
+            Form frm = this.CheckExists(typeof(MonHoc));
+            if (frm != null) frm.Activate();
+            else
+            {
+                MonHoc f = new MonHoc();
+                f.Visible = false;
+                f.MdiParent = this;
+                f.Show();
+            }
         }
     }
 }
